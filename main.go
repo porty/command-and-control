@@ -12,7 +12,6 @@ func main() {
 	os.Exit(realMain())
 }
 
-
 func realMain() int {
 	log.SetOutput(ioutil.Discard)
 
