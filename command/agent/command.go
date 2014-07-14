@@ -34,6 +34,7 @@ func (c *Command) Run(args []string) int {
 	c.Log = loggo.GetLogger("agent")
 
 	// main logic here
+	run()
 
 	return 0
 }
