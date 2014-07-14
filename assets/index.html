@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" href="tux.png">
+
+		<title>OBC CnC</title>
+
+		<!-- Bootstrap core CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<!-- Bootstrap theme -->
+		<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+		<!-- Font Awesome -->
+		<link href="css/font-awesome.min.css" rel="stylesheet">
+
+		<!-- Custom styles for this template -->
+		<link href="css/theme.css" rel="stylesheet">
+
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+
+	<body role="document">
+
+		<!-- Fixed navbar -->
+		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">OBC Command and Control</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#">Home</a></li>
+						<li><a href="#4g-status">4G Status</a></li>
+						<li><a href="#network-interfaces">Network Interfaces</a></li>
+						<li><a href="#network-routes">Network Routes</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="#">Action</a></li>
+								<li><a href="#">Another action</a></li>
+								<li><a href="#">Something else here</a></li>
+								<li class="divider"></li>
+								<li class="dropdown-header">Nav header</li>
+								<li><a href="#">Separated link</a></li>
+								<li><a href="#">One more separated link</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div><!--/.nav-collapse -->
+			</div>
+		</div>
+
+		<div class="container theme-showcase" role="main">
+
+			<div class="page-header" id="4g-status">
+				<h1><i class="fa fa-mobile"></i> 4G Status</h1>
+			</div>
+
+			<div class="row">
+
+				<div class="col-sm-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Device #1
+								<span class="label label-success">4G (LTE)</span>
+								<span class="label label-default">Shorty</span>
+							</h3>
+						</div>
+						<div class="panel-body">
+							Device <tt>usb0</tt><br/>
+							IP Address: <tt>192.168.1.1</tt><br/>
+							Connection: 4G (LTE)<br/>
+							This session: 23KB<br/>
+							Rates:
+							<span title="Download: 240KB/s"><i class="fa fa-arrow-circle-down"></i> 240KB/s</span>
+							<span title="Upload: 16KB/s"><i class="fa fa-arrow-circle-up"></i> 16KB/s</span>
+							<br/>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Device #2
+								<span class="label label-warning">3G (UTMS)</span>
+								<span class="label label-default">Jeff</span>
+							</h3>
+						</div>
+						<div class="panel-body">
+							Device <tt>usb1</tt><br/>
+							IP Address: <tt>192.168.2.1</tt><br/>
+							Connection: 3G<br/>
+							This session: 23KB<br/>
+							Rates:
+							<span title="Download: 240KB/s"><i class="fa fa-arrow-circle-down"></i> 240KB/s</span>
+							<span title="Upload: 16KB/s"><i class="fa fa-arrow-circle-up"></i> 16KB/s</span>
+							<br/>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Device #3
+								<span class="label label-danger">2G (EDGE)</span>
+								<span class="label label-default">Alex</span>
+							</h3>
+						</div>
+						<div class="panel-body">
+
+							<div>
+							</div>
+
+							Device <tt>usb2</tt><br/>
+							IP Address: <tt>192.168.3.1</tt><br/>
+							Connection: 2G<br/>
+							This session: 23KB<br/>
+							Rates:
+							<span title="Download: 240KB/s"><i class="fa fa-arrow-circle-down"></i> 240KB/s</span>
+							<span title="Upload: 16KB/s"><i class="fa fa-arrow-circle-up"></i> 16KB/s</span>
+							<br/>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+
+
+
+			<div class="page-header" id="network-interfaces">
+				<h1><i class="fa fa-exchange"></i> Network Interfaces</h1>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title"><i class="fa fa-sitemap"></i> eth0</h3>
+						</div>
+						<div class="panel-body">
+							IP Addresses: <tt>10.10.0.8/24</tt><br/>
+							Throughput:
+							<span title="Download: 240KB/s"><i class="fa fa-arrow-circle-down"></i> 240KB/s</span>
+							<span title="Upload: 16KB/s"><i class="fa fa-arrow-circle-up"></i> 16KB/s</span><br/>
+							Total:
+							<span title="Total downloaded: 6.57MB"><i class="fa fa-arrow-circle-down"></i> 6.57MB</span>
+							<span title="Total uploaded: 4.01MB"><i class="fa fa-arrow-circle-up"></i> 4.01MB</span><br/>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title"><i class="fa fa-mobile"></i> usb0</h3>
+						</div>
+						<div class="panel-body">
+							IP Addresses: <tt>192.168.1.1/24</tt><br/>
+							Throughput:
+							<span title="Download: 240KB/s"><i class="fa fa-arrow-circle-down"></i> 240KB/s</span>
+							<span title="Upload: 16KB/s"><i class="fa fa-arrow-circle-up"></i> 16KB/s</span><br/>
+							Total:
+							<span title="Total downloaded: 6.57MB"><i class="fa fa-arrow-circle-down"></i> 6.57MB</span>
+							<span title="Total uploaded: 4.01MB"><i class="fa fa-arrow-circle-up"></i> 4.01MB</span><br/>
+						</div>
+					</div>
+				</div><!-- /.col-sm-4 -->
+
+			</div>
+
+			<div class="page-header" id="network-routes">
+				<h1><i class="fa fa-random"></i> Network Routes</h1>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Destination</th>
+								<th>Gateway</th>
+								<th>Genmask</th>
+								<th>Flags</th>
+								<th>Metric</th>
+								<th>Ref</th>
+								<th>Use</th>
+								<th>Iface</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>0.0.0.0</td>
+								<td>192.168.0.1</td>
+								<td>0.0.0.0</td>
+								<td>UG</td>
+								<td>0</td>
+								<td>0</td>
+								<td>0</td>
+								<td>usb0</td>
+							</tr>
+							<tr>
+								<td>192.168.0.0</td>
+								<td>0.0.0.0</td>
+								<td>255.255.255.0</td>
+								<td>U</td>
+								<td>0</td>
+								<td>0</td>
+								<td>0</td>
+								<td>usb0</td>
+							</tr>
+							<tr>
+								<td>192.168.1.0</td>
+								<td>0.0.0.0</td>
+								<td>255.255.255.0</td>
+								<td>U</td>
+								<td>0</td>
+								<td>0</td>
+								<td>0</td>
+								<td>eth0</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+		</div> <!-- /container -->
+
+
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="js/jquery-2.1.1.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/react-0.10.0.min.js"></script>
+		<script src="js/stuff.js"></script>
+	</body>
+</html>
