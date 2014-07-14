@@ -28,7 +28,7 @@ GIT_DIRTY=$(shell test -n "`git status --porcelain`" && echo "+CHANGES" || true)
 
 # Use a local vendor directory for any dependencies; comment this out to
 # use the global GOPATH instead
-GOPATH=$(PWD)/.vendor
+#GOPATH=$(PWD)/.vendor
 
 INSTALL_PATH=$(GOPATH)/src/github.com/porty/command-and-control
 
@@ -45,7 +45,7 @@ help:
 	@echo '    make clean    Clean the directory tree.'
 	@echo
 
-build: .git $(GOPATH)/bin/gogpm $(INSTALL_PATH)
+build: .git $(GOPATH)/bin/gogpm $(INSTALL_PATH) dynamic-code
 	@echo "building ${OWNER} ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
 	$(GOPATH)/bin/gogpm install && \
@@ -53,6 +53,7 @@ build: .git $(GOPATH)/bin/gogpm $(INSTALL_PATH)
 
 clean:
 	@test ! -e bin/${BIN_NAME} || rm bin/${BIN_NAME}
+	rm -f bundled/*.go
 
 .git:
 	git init
@@ -72,10 +73,21 @@ $(INSTALL_PATH):
 $(GOPATH)/bin/gogpm:
 	go get github.com/mtibben/gogpm
 
+$(GOPATH)/bin/go-bindata:
+	go get github.com/jteeuwen/go-bindata/...
+
+dynamic-code: $(GOPATH)/bin/go-bindata bundled/assets-prod.go bundled/assets-dev.go
+
+bundled/assets-prod.go: assets assets/css assets/fonts assets/js
+	go-bindata -o $@ -pkg=bundled -prefix=assets -tags release $^
+
+bundled/assets-dev.go: assets assets/css assets/fonts assets/js
+	go-bindata -o $@ -pkg=bundled -prefix=assets -debug=true $^
+
 test:
 	go test ./...
 
 fmt:
 	find . -name '*.go' -not -path './.vendor/*' -exec gofmt -w=true {} ';'
 
-.PHONY: build dist clean test help default link fmt
+.PHONY: build dist clean test help default link fmt dynamic-code
