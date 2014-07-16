@@ -79,10 +79,10 @@ $(GOPATH)/bin/go-bindata:
 dynamic-code: $(GOPATH)/bin/go-bindata bundled/assets-prod.go bundled/assets-dev.go
 
 bundled/assets-prod.go: assets assets/css assets/fonts assets/js
-	go-bindata -o $@ -pkg=bundled -prefix=assets -tags release $^
+	$(GOPATH)/bin/go-bindata -o $@ -pkg=bundled -prefix=assets -tags release $^
 
 bundled/assets-dev.go: assets assets/css assets/fonts assets/js
-	go-bindata -o $@ -pkg=bundled -prefix=assets -debug=true $^
+	$(GOPATH)/bin/go-bindata -o $@ -pkg=bundled -prefix=assets -debug=true $^
 
 test:
 	go test ./...
