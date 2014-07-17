@@ -48,8 +48,9 @@ help:
 build: .git $(GOPATH)/bin/gogpm $(INSTALL_PATH) dynamic-code
 	@echo "building ${OWNER} ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
-	$(GOPATH)/bin/gogpm install && \
+	$(GOPATH)/bin/gogpm install
 	go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -o bin/${BIN_NAME}
+	GOARCH=arm GOOS=linux GOARM=5 go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -o bin/${BIN_NAME}-pi
 
 clean:
 	@test ! -e bin/${BIN_NAME} || rm bin/${BIN_NAME}
