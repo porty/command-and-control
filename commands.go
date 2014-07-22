@@ -9,6 +9,7 @@ import (
 	"github.com/mitchellh/cli"
 	"github.com/porty/command-and-control/command"
 	"github.com/porty/command-and-control/command/agent"
+	"github.com/porty/command-and-control/command/multiconnector"
 )
 
 // Commands is the mapping of all the available Serf commands.
@@ -26,6 +27,10 @@ func init() {
 				ShutdownCh: make(chan struct{}),
 				Log:        log,
 			}, nil
+		},
+
+		"multiconnector": func() (cli.Command, error) {
+			return multiconnector.NewMultiConnector(), nil
 		},
 
 		"dongler": func() (cli.Command, error) {
