@@ -68,6 +68,8 @@
 				<h1><i class="fa fa-mobile"></i> 4G Status</h1>
 			</div>
 
+			<div id="farts"></div>
+
 			<div class="row">
 
 				<div class="col-sm-4">
@@ -241,6 +243,18 @@
 			</div>
 
 
+
+
+
+
+			<div id="farts">
+
+			</div>
+
+
+
+
+
 		</div> <!-- /container -->
 
 
@@ -249,7 +263,155 @@
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script src="js/jquery-2.1.1.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
-		<script src="js/react-0.10.0.min.js"></script>
-		<script src="js/stuff.js"></script>
+		<script src="js/react-0.10.0.js"></script>
+		<script src="js/JSXTransformer-0.10.0.js"></script>
+		<script type="text/jsx">
+		/** @jsx React.DOM */
+
+		var SignalBar = React.createClass({
+			render: function() {
+				var min = 0;
+				var max = 5;
+				var value = this.props.value;
+				var percent = (value / max) * 100;
+				var style = {
+					"width": percent + "%"
+				};
+				var text = percent + "% signal";
+
+				return (
+					<div className="progress">
+						<div className="progress-bar progress-bar-info" role="progressbar" aria-valuenow={value} aria-valuemin={min} aria-valuemax={max} style={style}>
+							<span className="sr-only">{text}</span>
+						</div>
+					</div>
+				);
+			}
+		});
+
+		var DongleNetworkLabel = React.createClass({
+			render: function() {
+				var node = null;
+				switch (this.props.network_type) {
+					case "LTE":
+						node = (<span className="label label-success">4G (LTE)</span>)
+						break;
+					case "UMTS":
+						node = (<span className="label label-warning">3G (UTMS)</span>)
+						break;
+					case "EDGE":
+						node = (<span className="label label-danger">2.5G (EDGE)</span>)
+						break;
+					default:
+						node = (<span className="label label-danger">Other ({this.props.network_type})</span>)
+						break;
+					}
+				return node;
+			}
+		});
+
+		var DongleUserLabel = React.createClass({
+			names: {
+				"866948014271756": "Shorty #1",
+				"866948014610847": "Shorty #2",
+			},
+			render: function() {
+				var name = this.names[this.props.imei] || "???";
+				return (
+					<span className="label label-default">{name}</span>
+				);
+			}
+		});
+
+		var DongleBox = React.createClass({
+			render: function() {
+				return (
+					<div className="panel panel-default">
+						<div className="panel-heading">
+							<h3 className="panel-title">
+								Device #{this.props.number}&nbsp;
+								<DongleNetworkLabel network_type={this.props.dongle.Raw.network_type} />&nbsp;
+								<DongleUserLabel imei={this.props.dongle.Raw.imei} />
+							</h3>
+						</div>
+						<div className="panel-body">
+							Device <code>{this.props.dongle.Interface}</code><br/>
+							IP Address: <code>{this.props.dongle.Raw.wan_ipaddr}</code><br/>
+							Connection: <code>{this.props.dongle.Raw.network_type}</code><br/>
+							<SignalBar value={this.props.dongle.Raw.signalbar} />
+						</div>
+					</div>
+				);
+			}
+		});
+
+		var DongleBoxContainer = React.createClass({
+			getInitialState: function() {
+				return { data: [] };
+			},
+			render: function() {
+				var count = 0;
+				var dongleNodes = this.state.data.map(function (dongle) {
+					++count;
+					return (
+						<DongleBox dongle={dongle} number={count} key={dongle.Interface}>
+						</DongleBox>
+					);
+				});
+
+				var dividedNodes = [[], [], []];
+				for (var i = 0; i < dongleNodes.length; ++i) {
+					dividedNodes[i % 3].push(dongleNodes[i]);
+				}
+
+				// return (
+				// 	<div className="col-sm-4">
+				// 		{dividedNodes[0]}
+				// 	</div>
+				// 	<div className="col-sm-4">
+				// 		{dividedNodes[1]}
+				// 	</div>
+				// 	<div className="col-sm-4">
+				// 		{dividedNodes[2]}
+				// 	</div>
+				// );
+				return (
+					<div className="row">
+						<div className="col-sm-4">
+							{dividedNodes[0]}
+						</div>
+						<div className="col-sm-4">
+							{dividedNodes[1]}
+						</div>
+						<div className="col-sm-4">
+							{dividedNodes[2]}
+						</div>
+					</div>
+				);
+			},
+			loadDataFromServer: function() {
+				$.ajax({
+					url: this.props.url,
+					dataType: 'json',
+					success: function(data) {
+						this.setState({data: data});
+					}.bind(this),
+					error: function(xhr, status, err) {
+						console.error(this.props.url, status, err.toString());
+					}.bind(this)
+				});
+			},
+			componentWillMount: function() {
+				this.loadDataFromServer();
+				setInterval(this.loadDataFromServer, this.props.pollInterval);
+			},
+		});
+
+		React.renderComponent(
+			<DongleBoxContainer url="/dongles" pollInterval={2000} />,
+			document.getElementById('farts')
+		);
+
+		</script>
 	</body>
 </html>
