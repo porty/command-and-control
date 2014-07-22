@@ -14,6 +14,7 @@ var mimeTypes = map[string]string{
 	".html": "text/html; charset=utf-8",
 	".jpg":  "image/jpeg",
 	".js":   "application/javascript",
+	".json": "application/json",
 	".pdf":  "application/pdf",
 	".png":  "image/png",
 	".xml":  "text/xml; charset=utf-8",
