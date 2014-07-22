@@ -74,7 +74,7 @@ type ImeiRequest struct {
 
 // Run - Runs the multi connector
 func (mc MultiConnector) Run(args []string) int {
-	return main()
+	return run()
 }
 
 // Synopsis - Used for command line stuff
@@ -148,8 +148,7 @@ func (mc *MultiConnector) SetConfigured(ifaceName string) {
 	mc.configuredDevices[ifaceName] = true
 }
 
-// Main - where the magic happens
-func main() int {
+func run() int {
 
 	m := NewMultiConnector()
 
