@@ -230,6 +230,95 @@ URL: `http://192.168.0.1/goform/goform_get_cmd_process?multi_data=1&isTest=false
 }
 ```
 
+## Other JSON endpoints
+
+```
+http://192.168.0.1/goform/goform_get_cmd_process?isTest=false&cmd=wifi_coverage%2Cm_ssid_enable%2Cimei%2Cweb_version%2Cwa_inner_version%2Chardware_version%2CMAX_Access_num%2CSSID1%2Cm_SSID%2Cm_HideSSID%2Cm_MAX_Access_num%2Clan_ipaddr%2Cmac_address%2Cmsisdn%2CLocalDomain%2Cwan_ipaddr%2Cipv6_wan_ipaddr%2Cipv6_pdp_type%2Cpdp_type%2Cppp_status%2Csim_imsi%2Crssi%2Crscp%2Clte_rsrp%2Cnetwork_type&multi_data=1&_=1405508956431
+```
+
+```
+{
+  "wifi_coverage": "",
+  "m_ssid_enable": "",
+  "imei": "866948014610847",
+  "web_version": "MF823_T03",
+  "wa_inner_version": "MF823_T03",
+  "hardware_version": "MF823-2.0.0",
+  "MAX_Access_num": "",
+  "SSID1": "",
+  "m_SSID": "",
+  "m_HideSSID": "",
+  "m_MAX_Access_num": "",
+  "lan_ipaddr": "192.168.0.1",
+  "mac_address": "",
+  "msisdn": "",
+  "LocalDomain": "m.home",
+  "wan_ipaddr": "10.96.78.97",
+  "ipv6_wan_ipaddr": "3930:0000:0000:0000:948a:b820:4e9a:6a26",
+  "ipv6_pdp_type": "IP",
+  "pdp_type": "IP",
+  "ppp_status": "ppp_connected",
+  "sim_imsi": "505013457711705",
+  "rssi": "",
+  "rscp": "",
+  "lte_rsrp": "-101",
+  "network_type": "LTE"
+}
+```
+
+## Custom JSON request
+
+```
+curl "http://192.168.0.1/goform/goform_get_cmd_process?isTest=false&multi_data=1&cmd=imei%2Csim_imsi%2Cwan_ipaddr%2Cipv6_wan_ipaddr%2Cppp_status%2Cnetwork_type%2Csignalbar%2Cnet_select"
+```
+
+```
+{
+  "imei": "866948014610847",
+  "sim_imsi": "505013457711705",
+  "wan_ipaddr": "10.96.78.97",
+  "ipv6_wan_ipaddr": "3930:0000:0000:0000:948a:b820:4e9a:6a26",
+  "ppp_status": "ppp_connected",
+  "network_type": "LTE",
+  "signalbar": "3"
+  "net_select":"Only_LTE"
+}
+```
+
+## Network Selection Info
+
+```
+http://192.168.0.1/goform/goform_get_cmd_process?isTest=false&cmd=current_network_mode%2Cm_netselect_save%2Cnet_select_mode%2Cm_netselect_contents%2Cnet_select%2Cppp_status%2Cmodem_main_state&multi_data=1&_=1405514324767
+```
+
+```
+{
+  "current_network_mode": "",
+  "m_netselect_save": "",
+  "net_select_mode": "auto_select",
+  "m_netselect_contents": "",
+  "net_select": "NETWORK_auto",
+  "ppp_status": "ppp_connected",
+  "modem_main_state": "modem_init_complete"
+}
+```
+
+## Changing Network Preference
+
+### To 4G Only
+
+```
+POST /goform/goform_set_cmd_process
+Accept:application/json, text/javascript, */*; q=0.01
+Content-Length:69
+Content-Type:application/x-www-form-urlencoded; charset=UTF-8
+Origin:http://192.168.0.1
+Host:192.168.0.1
+
+isTest=false&goformId=SET_BEARER_PREFERENCE&BearerPreference=Only_LTE
+
+
+```
 
 # Route dump example
 
