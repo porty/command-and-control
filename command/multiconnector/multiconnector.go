@@ -46,6 +46,13 @@ func NewMultiConnector() MultiConnector {
 		"192.168.2.2",
 	}
 
+	oi["866948014175684"] = DongleOwnerInfo{
+		"866948014175684",
+		"Jeff #1",
+		"192.168.3.1",
+		"192.168.3.2",
+	}
+
 	m := MultiConnector{cd, oi}
 	return m
 }
