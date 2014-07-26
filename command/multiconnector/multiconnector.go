@@ -150,6 +150,31 @@ func (mc MultiConnector) ChangeIPAddress(ifaceName string, address string) {
 	fmt.Println(string(b))
 }
 
+// AddGateway - Adds the specified IP address as a default route
+func (mc MultiConnector) AddGateway(gateway string) {
+	// sudo route add default gw 192.168.3.1 metric 10
+	cmd := exec.Command("sudo", "route", "add", "default", "gw", gateway, "metric", "10")
+	b, err := cmd.CombinedOutput()
+
+	if err != nil {
+		switch v := err.(type) {
+		case *exec.ExitError:
+
+			// lol golang
+			exitCode := v.Sys().(syscall.WaitStatus)
+			exitCode = (exitCode & 0xff00) >> 8
+
+			fmt.Printf("Command exited with exit code %d\n", exitCode)
+
+		default:
+			//fmt.Printf("unexpected type %T\n", v)
+			fmt.Println("Failed to call route: " + err.Error())
+		}
+	}
+
+	fmt.Println(string(b))
+}
+
 // SetConfigured - Set that we have configured this one
 func (mc *MultiConnector) SetConfigured(ifaceName string) {
 	mc.configuredDevices[ifaceName] = true
@@ -192,6 +217,10 @@ func run() int {
 			// give that interface that particular IP address/range
 			m.ChangeIPAddress(ifaceName, ownerInfo.InterfaceIPAddress)
 			fmt.Printf("Changed the IP address of %s to %s\n", ifaceName, ownerInfo.InterfaceIPAddress)
+
+			// add that IP as a Internet gateway
+			m.AddGateway(ownerInfo.DongleIPAddress)
+			fmt.Printf("Added route for %s to %s\n", ifaceName, ownerInfo.DongleIPAddress)
 
 			// it is now configured
 			m.SetConfigured(ifaceName)
