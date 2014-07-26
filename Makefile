@@ -92,4 +92,7 @@ test:
 fmt:
 	find . -name '*.go' -not -path './.vendor/*' -exec gofmt -w=true {} ';'
 
+upload:
+	scp bin/${BIN_NAME}-pi-release pi@192.168.60.2:/home/pi/command-and-control
+
 .PHONY: build dist clean test help default link fmt dynamic-code
