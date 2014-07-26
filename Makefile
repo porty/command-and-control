@@ -49,8 +49,9 @@ build: .git $(GOPATH)/bin/gogpm $(INSTALL_PATH) dynamic-code
 	@echo "building ${OWNER} ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
 	$(GOPATH)/bin/gogpm install
-	go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -o bin/${BIN_NAME}
-	GOARCH=arm GOOS=linux GOARM=5 go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -o bin/${BIN_NAME}-pi
+	go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -tags debug -o bin/${BIN_NAME}
+	go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -tags release -o bin/${BIN_NAME}-release
+	GOARCH=arm GOOS=linux GOARM=5 go build -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY}" -tags release -o bin/${BIN_NAME}-pi-release
 
 clean:
 	@test ! -e bin/${BIN_NAME} || rm bin/${BIN_NAME}
@@ -83,7 +84,7 @@ bundled/assets-prod.go: assets assets/css assets/fonts assets/js
 	$(GOPATH)/bin/go-bindata -o $@ -pkg=bundled -prefix=assets -tags release $^
 
 bundled/assets-dev.go: assets assets/css assets/fonts assets/js
-	$(GOPATH)/bin/go-bindata -o $@ -pkg=bundled -prefix=assets -debug=true $^
+	$(GOPATH)/bin/go-bindata -o $@ -pkg=bundled -prefix=assets -debug=true -tags debug $^
 
 test:
 	go test ./...
