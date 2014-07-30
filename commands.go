@@ -10,6 +10,7 @@ import (
 	"github.com/porty/command-and-control/command"
 	"github.com/porty/command-and-control/command/agent"
 	"github.com/porty/command-and-control/command/multiconnector"
+	"github.com/porty/command-and-control/command/uploader"
 )
 
 // Commands is the mapping of all the available Serf commands.
@@ -37,6 +38,10 @@ func init() {
 			return &command.DonglerCommand{
 				Ui: ui,
 			}, nil
+		},
+
+		"upload": func() (cli.Command, error) {
+			return &uploader.UploadCommand{}, nil
 		},
 
 		"version": func() (cli.Command, error) {
