@@ -90,7 +90,7 @@ func (w *DirectoryWatcher) setTrigger(c chan byte) {
 	w.trigger = c
 }
 
-func things(s string) (valid bool, shortened string, other string) {
+func getPathInfo(s string) (valid bool, shortened string, other string) {
 	if strings.HasSuffix(s, ".jpg") {
 		valid = true
 		shortened = s[:len(s)-4]
@@ -116,7 +116,7 @@ func (w *DirectoryWatcher) watchOne() (ret []FileInfo) {
 	}
 
 	for _, f := range raw {
-		valid, shortened, other := things(f.Name())
+		valid, shortened, other := getPathInfo(f.Name())
 		if valid {
 			if memory[other] {
 				ret = append(ret, NewFileInfo((*w.dir).Path(), shortened))
