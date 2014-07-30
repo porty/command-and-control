@@ -8,14 +8,16 @@ import (
 	"net"
 	"net/http"
 	"os/exec"
+	"strings"
 	"syscall"
 	"time"
 )
 
 // MultiConnector - Configures the dongles
 type MultiConnector struct {
-	configuredDevices map[string]bool
+	configuredDevices map[string]*DongleOwnerInfo
 	ownerInfo         map[string]DongleOwnerInfo
+	tables            map[string]string
 }
 
 // DongleOwnerInfo - stored info about a dongle
@@ -24,12 +26,17 @@ type DongleOwnerInfo struct {
 	Name               string
 	DongleIPAddress    string
 	InterfaceIPAddress string
+	Network            string
 }
 
 // NewMultiConnector - Get a new MultiConnector object
 func NewMultiConnector() MultiConnector {
-	cd := make(map[string]bool)
+	//cd := make(map[string]bool)
+	// ifaceName: owner
+	cd := make(map[string]*DongleOwnerInfo)
+	// IMEI: owner
 	oi := make(map[string]DongleOwnerInfo)
+	tables := make(map[string]string)
 
 	// TODO save this in a JSON or text file or something
 	oi["866948014271756"] = DongleOwnerInfo{
@@ -37,6 +44,7 @@ func NewMultiConnector() MultiConnector {
 		"Shorty #1",
 		"192.168.1.1",
 		"192.168.1.2",
+		"192.168.1.0/24",
 	}
 
 	oi["866948014610847"] = DongleOwnerInfo{
@@ -44,6 +52,7 @@ func NewMultiConnector() MultiConnector {
 		"Shorty #2",
 		"192.168.2.1",
 		"192.168.2.2",
+		"192.168.2.0/24",
 	}
 
 	oi["866948014175684"] = DongleOwnerInfo{
@@ -51,9 +60,14 @@ func NewMultiConnector() MultiConnector {
 		"Jeff #1",
 		"192.168.3.1",
 		"192.168.3.2",
+		"192.168.3.0/24",
 	}
 
-	m := MultiConnector{cd, oi}
+	tables["usb0"] = "uzb0"
+	tables["usb1"] = "uzb1"
+	tables["usb2"] = "uzb2"
+
+	m := MultiConnector{cd, oi, tables}
 	return m
 }
 
@@ -71,7 +85,7 @@ func (mc MultiConnector) Exists(ifaceName string) bool {
 // IsAlreadyConfigured - Have we already done this one?
 func (mc MultiConnector) IsAlreadyConfigured(ifaceName string) bool {
 	// the "zero" value for a bool is false
-	return mc.configuredDevices[ifaceName]
+	return mc.configuredDevices[ifaceName] != nil
 }
 
 // ImeiRequest - What is returned by the IMEI request to the dongle
@@ -150,13 +164,58 @@ func (mc MultiConnector) ChangeIPAddress(ifaceName string, address string) {
 	fmt.Println(string(b))
 }
 
-// AddGateway - Adds the specified IP address as a default route
-func (mc MultiConnector) AddGateway(gateway string) {
-	// sudo route add default gw 192.168.3.1 metric 10
-	cmd := exec.Command("sudo", "route", "add", "default", "gw", gateway, "metric", "10")
+// TakeDown - Take the interface down!
+func (mc MultiConnector) TakeDown(ifaceName string) {
+	cmd := exec.Command("sudo", "ifconfig", ifaceName, "down")
 	b, err := cmd.CombinedOutput()
 
 	if err != nil {
+		switch v := err.(type) {
+		case *exec.ExitError:
+
+			// lol golang
+			exitCode := v.Sys().(syscall.WaitStatus)
+			exitCode = (exitCode & 0xff00) >> 8
+
+			fmt.Printf("Command exited with exit code %d\n", exitCode)
+
+		default:
+			//fmt.Printf("unexpected type %T\n", v)
+			fmt.Println("Failed to call ifconfig: " + err.Error())
+		}
+	}
+
+	fmt.Println(string(b))
+}
+
+// AddGateway - Adds the specified IP address as a default route
+func (mc MultiConnector) AddGateway(ifaceName string, d DongleOwnerInfo) {
+	var cmd string
+	table := mc.tables[ifaceName]
+	// http://www.thomas-krenn.com/en/wiki/Two_Default_Gateways_on_One_System
+	// ip route add 10.10.0.0/24 dev eth1 src 10.10.0.10 table rt2
+	cmd = fmt.Sprintf("ip route add %s dev %s src %s table %s", d.Network, ifaceName, d.InterfaceIPAddress, table)
+	runCommand("sudo", strings.Split(cmd, " ")...)
+	// ip route add default via 10.10.0.1 dev eth1 table rt2
+	cmd = fmt.Sprintf("ip route add default via %s dev %s table %s", d.DongleIPAddress, ifaceName, table)
+	runCommand("sudo", strings.Split(cmd, " ")...)
+	// ip rule add from 10.10.0.10/32 table rt2
+	cmd = fmt.Sprintf("ip rule add from %s/32 table %s", d.InterfaceIPAddress, table)
+	runCommand("sudo", strings.Split(cmd, " ")...)
+	// ip rule add to 10.10.0.10/32 table rt2
+	cmd = fmt.Sprintf("ip rule add to %s/32 table %s", d.InterfaceIPAddress, table)
+	runCommand("sudo", strings.Split(cmd, " ")...)
+}
+
+func runCommand(command string, args ...string) (ret bool) {
+	fmt.Printf("RUN %s %s\n", command, strings.Join(args, " "))
+
+	cmd := exec.Command(command, args...)
+	b, err := cmd.CombinedOutput()
+	ret = true
+
+	if err != nil {
+		ret = false
 		switch v := err.(type) {
 		case *exec.ExitError:
 
@@ -173,11 +232,22 @@ func (mc MultiConnector) AddGateway(gateway string) {
 	}
 
 	fmt.Println(string(b))
+	return
 }
 
 // SetConfigured - Set that we have configured this one
-func (mc *MultiConnector) SetConfigured(ifaceName string) {
-	mc.configuredDevices[ifaceName] = true
+func (mc *MultiConnector) SetConfigured(ifaceName string, owner *DongleOwnerInfo) {
+	mc.configuredDevices[ifaceName] = owner
+}
+
+// ReplaceGateways - Blow away the gateways!
+func (mc *MultiConnector) ReplaceGateways() {
+	// sudo ip route replace default scope global nexthop via 192.168.1.1 dev usb0 weight 1 nexthop via 192.168.2.1 dev usb1 weight 1
+	var hops string
+	for iface, hop := range mc.configuredDevices {
+		hops = hops + " nexthop via " + hop.DongleIPAddress + " dev " + iface + " weight 1"
+	}
+	runCommand("sudo", strings.Split("ip route replace default scope global"+hops, " ")...)
 }
 
 func run() int {
@@ -214,16 +284,27 @@ func run() int {
 			}
 			fmt.Printf("The dongle at %s is identified as %s\n", ifaceName, ownerInfo.Name)
 
+			m.TakeDown(ifaceName)
+			fmt.Printf("Dongle %s is now down\n", ifaceName)
+
+			// ip route add 10.10.0.0/24 dev eth1 src 10.10.0.10 table rt2
+			// ip route add default via 10.10.0.1 dev eth1 table rt2
+			// ip rule add from 10.10.0.10/32 table rt2
+			// ip rule add to 10.10.0.10/32 table rt2
+
 			// give that interface that particular IP address/range
 			m.ChangeIPAddress(ifaceName, ownerInfo.InterfaceIPAddress)
 			fmt.Printf("Changed the IP address of %s to %s\n", ifaceName, ownerInfo.InterfaceIPAddress)
 
 			// add that IP as a Internet gateway
-			m.AddGateway(ownerInfo.DongleIPAddress)
+			m.AddGateway(ifaceName, *ownerInfo)
 			fmt.Printf("Added route for %s to %s\n", ifaceName, ownerInfo.DongleIPAddress)
 
 			// it is now configured
-			m.SetConfigured(ifaceName)
+			m.SetConfigured(ifaceName, ownerInfo)
+
+			// make shit work
+			m.ReplaceGateways()
 
 			// next
 		}
