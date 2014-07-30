@@ -32,6 +32,11 @@ func (f FileInfo) GetTextPath() string {
 	return path.Join(f.dir, f.name+".txt")
 }
 
+// GetBaseName - e.g. "100" for "100.jpg"
+func (f FileInfo) GetBaseName() string {
+	return f.name
+}
+
 //
 // DirectoryWatcher
 //
@@ -67,18 +72,21 @@ type DirectoryWatcher struct {
 	handled   []FileInfo
 	trigger   chan byte
 	spincount uint32
+	ignores   map[string]bool
 }
 
 // NewDirectoryWatcher - Get a new DirectoryWatcher
 func NewDirectoryWatcher(dir DirectoryLister /*string*/) DirectoryWatcher {
 	closed := make(chan byte)
 	close(closed)
+	ignores := make(map[string]bool)
 	return DirectoryWatcher{
 		&dir,
 		make(chan FileInfo),
 		make([]FileInfo, 0, 100),
 		closed,
 		0,
+		ignores,
 	}
 }
 
@@ -128,6 +136,26 @@ func (w *DirectoryWatcher) watchOne() (ret []FileInfo) {
 	}
 
 	return
+}
+
+func (w *DirectoryWatcher) watchOneWithIgnores() (ret []FileInfo) {
+	ret = make([]FileInfo, 0, 10)
+	for _, f := range w.watchOne() {
+		if !w.ignores[f.GetBaseName()] {
+			ret = append(ret, f)
+		}
+	}
+	return
+}
+
+// AddIgnore - Adding "100" will ignore files "100.jpg" and "100.txt"
+func (w *DirectoryWatcher) AddIgnore(baseName string) {
+	w.ignores[baseName] = true
+}
+
+// RemoveIgnore - opposite to AddIgnore
+func (w *DirectoryWatcher) RemoveIgnore(baseName string) {
+	delete(w.ignores, baseName)
 }
 
 // Watch - Start watching that directory for new files - never exits
